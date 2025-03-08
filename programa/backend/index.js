@@ -1,9 +1,12 @@
 const { Game } = require('./src/entities.js');
 
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = 3000;
 let game = undefined;
+
+app.use(cors());
 
 app.get('/', (req, res) => {
   res.send('<h1>Test</h1>');

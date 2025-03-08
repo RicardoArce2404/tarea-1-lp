@@ -1,33 +1,77 @@
-import { useState } from 'react'
-import './App.css'
+import { useState, useEffect } from "react";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const [isGameStarted, setGameStarted] = useState(false);
+  const handleStartButton = () => {
+    setGameStarted(true);
+  };
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {!isGameStarted && <Menu handleStartButton={handleStartButton} />}
+      {isGameStarted && <GameScreen />}
     </>
-  )
+  );
 }
 
-export default App
+function Menu({ handleStartButton }) {
+  return (
+    <div className="menu">
+      <button type="button" onClick={handleStartButton}>
+        Iniciar Juego
+      </button>
+      <button type="button">Ver historial de resultados</button>
+    </div>
+  );
+}
+
+function GameScreen() {
+  const [word, setWord] = useState("");
+  const [appearances, setAppearances] = useState([]);
+
+  useEffect(() => {
+    const getData = async () => {
+      const response = await fetch("http://localhost:3000/start?n1=Yass&n2=Cris", {
+        method: "POST",
+      });
+      const data = await response.json();
+      setWord(data.startingWord);
+    };
+    getData();
+  }, []);
+
+  const checkLetter = async () => {
+    const text = document.getElementById("letter").value;
+    if (text.length !== 1) {
+      return;
+    }
+    const response = await fetch(
+      `http://localhost:3000/check-letter?letter=${text}`,
+      {
+        method: "POST",
+      },
+    );
+    const data = await response.json();
+    setAppearances(appearances + data.appearances);
+  }
+
+  const letters = [];
+  for (let i = 0; i < word.length; i++) {
+    if (appearances.includes(i)) {
+      letters.push(<div className="letter">{word[i]}</div>);
+    } else {
+      letters.push(<div className="letter">-</div>);
+    }
+  }
+  return (
+    <div className="game-screen">
+      <div className="word">{...letters}</div>
+      <div className="controls">
+        <input type="text" name="letter" id="letter" placeholder="-" />
+        <button type="button" onClick={checkLetter}>Probar</button>
+      </div>
+    </div>
+  );
+}
+
+export default App;
