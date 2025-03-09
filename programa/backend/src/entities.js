@@ -13,11 +13,12 @@ class Game {
     this.winner = undefined;
     this.player1 = new Player(name1);
     this.player2 = new Player(name2);
+    this.currentPlayer = undefined;
 
     this.unusedWords = [...require("../data/words.json").words];
-    this.round1 = new Round(1, this.getWord());
-    this.round2 = new Round(2, this.getWord());
-    this.currentRound = 1;
+    this.turn1 = new Turn(1, this.getWord());
+    this.turn2 = new Turn(2, this.getWord());
+    this.currentTurn = 1;
   }
 
   getWord() {
@@ -28,7 +29,7 @@ class Game {
   }
 }
 
-class Round {
+class Turn {
   constructor(number, word) {
     this.number = number;
     this.word = word;
@@ -41,6 +42,7 @@ class Round {
 class Player {
   constructor(name) {
     this.name = name;
+    this.remainingLives = 6;
   }
 }
 

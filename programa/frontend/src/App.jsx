@@ -1,76 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./App.css";
+import { Menu } from "./components/Menu.jsx";
+import { GameScreen } from "./components/GameScreen.jsx";
 
 function App() {
   const [isGameStarted, setGameStarted] = useState(false);
+  const [names, setNames] = useState([]);
   const handleStartButton = () => {
+    const name1 = document.getElementById("name1").value;
+    const name2 = document.getElementById("name2").value;
+    setNames([name1, name2]);
     setGameStarted(true);
   };
   return (
     <>
       {!isGameStarted && <Menu handleStartButton={handleStartButton} />}
-      {isGameStarted && <GameScreen />}
+      {isGameStarted && <GameScreen names={names} />}
     </>
-  );
-}
-
-function Menu({ handleStartButton }) {
-  return (
-    <div className="menu">
-      <button type="button" onClick={handleStartButton}>
-        Iniciar Juego
-      </button>
-      <button type="button">Ver historial de resultados</button>
-    </div>
-  );
-}
-
-function GameScreen() {
-  const [word, setWord] = useState("");
-  const [appearances, setAppearances] = useState([]);
-
-  useEffect(() => {
-    const getData = async () => {
-      const response = await fetch("http://localhost:3000/start?n1=Yass&n2=Cris", {
-        method: "POST",
-      });
-      const data = await response.json();
-      setWord(data.startingWord);
-    };
-    getData();
-  }, []);
-
-  const checkLetter = async () => {
-    const text = document.getElementById("letter").value;
-    if (text.length !== 1) {
-      return;
-    }
-    const response = await fetch(
-      `http://localhost:3000/check-letter?letter=${text}`,
-      {
-        method: "POST",
-      },
-    );
-    const data = await response.json();
-    setAppearances(appearances + data.appearances);
-  }
-
-  const letters = [];
-  for (let i = 0; i < word.length; i++) {
-    if (appearances.includes(i)) {
-      letters.push(<div className="letter">{word[i]}</div>);
-    } else {
-      letters.push(<div className="letter">-</div>);
-    }
-  }
-  return (
-    <div className="game-screen">
-      <div className="word">{...letters}</div>
-      <div className="controls">
-        <input type="text" name="letter" id="letter" placeholder="-" />
-        <button type="button" onClick={checkLetter}>Probar</button>
-      </div>
-    </div>
   );
 }
 
