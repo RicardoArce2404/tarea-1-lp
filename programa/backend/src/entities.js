@@ -33,8 +33,9 @@ class Turn {
   constructor(number, word) {
     this.number = number;
     this.word = word;
-    this.duration = 0;
-    this.winner = undefined;
+    this.timeStart = undefined;
+    this.timeEnd = undefined;
+    this.playerWon = undefined;
     this.usedLetters = [];
   }
 }

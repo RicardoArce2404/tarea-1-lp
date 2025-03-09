@@ -23,6 +23,7 @@ app.post("/start", (req, res) => {
     startingPlayer: sp,
     startingWord: word,
   });
+  game.turn1.timeStart = Date.now();
   return;
 });
 
@@ -68,11 +69,18 @@ app.post("/check-letter", (req, res) => {
 });
 
 app.post("/change-turn", (req, res) => {
+  game.turn1.timeEnd = Date.now();
   game.currentTurn = 2;
-  const nextPlayer = game.currentPlayer === 0 ? 1 : 0;
+  const nextPlayer = (game.currentPlayer === 0) ? 1 : 0;
+  console.log({ player: nextPlayer, word: game.turn2.word.str });
   res.status(200).json({ player: nextPlayer, word: game.turn2.word.str });
+  game.turn2.timeStart = Date.now();
   return;
 });
+
+app.post("/end", (req, res) => {
+  game.turn2.timeEnd = Date.now();
+})
 
 app.listen(port, () => {
   console.log("App ready");

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+const TURN_DURATION = 10;
+
 async function fetchData(path) {
   const response = await fetch(`http://localhost:3000/${path}`, {
     method: "POST",
@@ -8,7 +10,11 @@ async function fetchData(path) {
   return data;
 }
 
-export function GameScreen({ names }) {
+async function sleep(ms) {
+  await new Promise((r) => setTimeout(r, ms));
+}
+
+export function GameScreen({ names, handleGameEnd }) {
   const [word, setWord] = useState("");
   const [appearances, setAppearances] = useState([]);
   const [usedLetters, setUsedLetters] = useState([]);
@@ -21,6 +27,7 @@ export function GameScreen({ names }) {
       if (turn === 0) {
         const data = await fetchData(`start?n1=${names[0]}&n2=${names[1]}`);
         setWord(data.startingWord);
+        console.log(data.startingWord);
         setPlayerNum(data.startingPlayer);
       } else {
         const data = await fetchData("change-turn");
@@ -43,10 +50,26 @@ export function GameScreen({ names }) {
     usedLetters.push(text);
     setAppearances(appearances + data.appearances);
     setRemainingLives(data.remainingLives);
+    if (data.remainingLives === 0) {
+      await sleep(2000);
+      setTurn(1);
+    }
     if (data.completed) {
       console.log("win");
-      await new Promise((r) => setTimeout(r, 2000));
+      await sleep(2000);
+      if (turn === 0) {
+        setTurn(1);
+      } else {
+        handleGameEnd();
+      }
+    }
+  };
+
+  const handleTimeout = () => {
+    if (turn === 0) {
       setTurn(1);
+    } else {
+      handleGameEnd();
     }
   };
 
@@ -72,6 +95,26 @@ export function GameScreen({ names }) {
         </button>
       </div>
       <div>Vidas restantes: {remainingLives}</div>
+      <div>
+        Tiempo restante: <Counter handleTimeoutFunction={handleTimeout} />
+      </div>
     </div>
   );
+}
+
+function Counter({handleTimeoutFunction}) {
+  const [seconds, setSeconds] = useState(TURN_DURATION);
+  useEffect(() => {
+    if (seconds <= 0) {
+      setSeconds(TURN_DURATION);
+      handleTimeoutFunction();
+      return;
+    }
+    const timerId = setInterval(() => {
+      setSeconds(seconds - 1);
+    }, 1000);
+    return () => clearInterval(timerId);
+  }, [handleTimeoutFunction, seconds]);
+
+  return <div>{seconds}</div>;
 }
