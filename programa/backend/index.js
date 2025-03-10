@@ -1,11 +1,11 @@
-const { Game } = require("./src/entities.js");
+const { Game, History } = require("./src/entities.js");
 
 const express = require("express");
 const cors = require("cors");
 const app = express();
 const port = 3000;
 let game = undefined;
-
+const history = new History();
 app.use(cors());
 
 app.get("/", (req, res) => {
@@ -15,7 +15,7 @@ app.get("/", (req, res) => {
 
 app.post("/start", (req, res) => {
   const { name1, name2 } = req.query;
-  game = new Game(name1, name2); // Set up game logic.
+  game = new Game(history.gameCount, name1, name2); // Set up game logic.
   const sp = Math.round(Math.random()); // Choose the starting player. 0: P1, 1: P2.P2.
   game.currentPlayer = sp;
 
@@ -80,18 +80,15 @@ app.post("/check-letter", (req, res) => {
 app.post("/change-turn", (req, res) => {
   game.turn1.timeEnd = Date.now();
   game.currentTurn = 2;
-  const nextPlayer = (game.currentPlayer === 0) ? 1 : 0;
-  res.status(200).json({ player: nextPlayer, word: game.turn2.word.str });
+  game.currentPlayer = (game.currentPlayer === 0) ? 1 : 0;
+  res.status(200).json({ player: game.currentPlayer, word: game.turn2.word.str });
   game.turn2.timeStart = Date.now();
   return;
 });
 
 app.post("/end", (req, res) => {
   game.turn2.timeEnd = Date.now();
-  res.status(200).send({});
-});
 
-app.post("/get-winner", (req, res) => {
   let winner = "";
   const p1 = game.player1;
   const p2 = game.player2;
@@ -120,7 +117,24 @@ app.post("/get-winner", (req, res) => {
       winner = p2.name;
     }
   }
-  res.status(200).json({winner: winner});
+
+  if (winner === "") {
+    game.result = "Empate";
+  } else {
+    game.result = "Ganador único'"
+  }
+  game.winner = winner;
+
+  history.registerGame(game.player1.name, game.player2.name, game.result, game.winner);
+  res.status(200).send({});
+});
+
+app.post("/get-winner", (req, res) => {
+  res.status(200).json({winner: game.winner});
+});
+
+app.get("/get-history", (req, res) => {
+  res.status(200).json(history.historyData);
 });
 
 app.listen(port, () => {

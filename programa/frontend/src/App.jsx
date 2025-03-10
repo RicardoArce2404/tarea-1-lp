@@ -3,6 +3,7 @@ import "./App.css";
 import { Menu } from "./components/Menu.jsx";
 import { GameScreen } from "./components/GameScreen.jsx";
 import { ResultsScreen } from "./components/ResultsScreen.jsx";
+import { HistoryScreen } from "./components/HistoryScreen.jsx";
 
 async function fetchData(path) {
   const response = await fetch(`http://localhost:3000/${path}`, {
@@ -29,15 +30,20 @@ function App() {
     console.log("end")
   }
 
-  const handleRestart = () => {
+  const handleReturnHome = () => {
     setGameStage("not_started");
   }
 
+  const handleHistoryButton = () => {
+    setGameStage("history");
+  };
+
   return (
     <>
-      {(gameStage === "not_started") && <Menu handleStartButton={handleStartButton} />}
+      {(gameStage === "not_started") && <Menu handleStartButton={handleStartButton} handleHistoryButton={handleHistoryButton} />}
       {(gameStage === "started") && <GameScreen names={names} handleGameEnd={handleGameEnd} />}
-      {(gameStage === "finished") && <ResultsScreen handleRestart={handleRestart} />}
+      {(gameStage === "finished") && <ResultsScreen handleReturnHome={handleReturnHome} />}
+      {(gameStage === "history") && <HistoryScreen handleReturnHome={handleReturnHome} />}
     </>
   );
 }

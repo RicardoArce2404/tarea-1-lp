@@ -1,4 +1,4 @@
-export function Menu({ handleStartButton }) {
+export function Menu({ handleStartButton, handleHistoryButton }) {
   return (
     <div className="menu">
       <input type="text" id="name1" placeholder="Jugador 1"/>
@@ -6,7 +6,7 @@ export function Menu({ handleStartButton }) {
       <button type="button" onClick={handleStartButton}>
         Iniciar Juego
       </button>
-      <button type="button">Ver historial de resultados</button>
+      <button type="button" onClick={handleHistoryButton} >Ver historial de resultados</button>
     </div>
   );
 }

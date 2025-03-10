@@ -8,7 +8,7 @@ async function fetchData(path) {
   return data;
 }
 
-export function ResultsScreen({handleRestart}) {
+export function ResultsScreen({handleReturnHome}) {
   const [winText, setWinText] = useState("Los jugadores empataron");
   useEffect(() => {
     const setData = async () => {
@@ -26,7 +26,7 @@ export function ResultsScreen({handleRestart}) {
     <div>
       <h1>Resultados</h1>
       <div>{winText}</div>
-      <button type="button" onClick={handleRestart}>Volver a jugar</button>
+      <button type="button" onClick={handleReturnHome}>Volver a jugar</button>
     </div>
   )
 }

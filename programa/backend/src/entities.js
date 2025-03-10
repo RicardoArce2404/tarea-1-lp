@@ -1,21 +1,34 @@
+const fs = require("node:fs");
+
 class History {
   constructor() {
-    const historyFile = require("../data/history.json");
-    this.gameCount = Object.keys(historyFile).length;
+    this.historyData = JSON.parse(fs.readFileSync("data/history.json", "utf8"));
+    this.gameCount = Object.keys(this.historyData).length;
+  }
+
+  registerGame(player1, player2, result, winner) {
+    const gameData = {
+      player1: player1,
+      player2: player2,
+      result: result,
+      winner: winner
+    };
+    this.historyData.push(gameData);
+    fs.writeFileSync("data/history.json", JSON.stringify(this.historyData));
+    this.historyData = JSON.parse(fs.readFileSync("data/history.json", "utf8"));
   }
 }
 
 class Game {
-  constructor(name1, name2) {
-    const history = new History();
-    this.id = history.gameCount;
+  constructor(id, name1, name2) {
+    this.id = id;
     this.result = undefined;
     this.winner = undefined;
     this.player1 = new Player(name1);
     this.player2 = new Player(name2);
     this.currentPlayer = undefined;
 
-    this.unusedWords = [...require("../data/words.json").words];
+    this.unusedWords = JSON.parse(fs.readFileSync("data/words.json", "utf8")).words;
     this.turn1 = new Turn(1, this.getWord());
     this.turn2 = new Turn(2, this.getWord());
     this.currentTurn = 1;
@@ -56,4 +69,4 @@ class Word {
   }
 }
 
-module.exports = { Game };
+module.exports = { Game, History };
