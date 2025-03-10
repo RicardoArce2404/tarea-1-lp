@@ -20,6 +20,13 @@ body {
   background: #40444B;
 }
 
+.menu-options {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  margin-top: 15px;
+}
+
 .gs {
   text-align: center;
 }
@@ -33,6 +40,10 @@ body {
   display: flex;
   justify-content: center;
   gap: 3px;
-  margin-top: 50px;
+  margin: 50px 0px 20px 0px;
 }
 
+.gs-controls input {
+  width: 50px;
+  margin-right: 10px;
+}
