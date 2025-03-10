@@ -1,3 +1,9 @@
+body {
+  background: #2C2F33;
+  color: white;
+  font-size: 20px;
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -5,14 +11,28 @@
   text-align: center;
 }
 
-.game-options {
-  display: flex;
+.ms-player-names {
+  display: block;
 }
 
-.word {
-  display: flex;
+.history-table {
+  color: white;
+  background: #40444B;
 }
 
-.controls {
-  display: flex;
+.gs {
+  text-align: center;
 }
+
+.gs-player-name {
+  display: block;
+}
+
+.gs-word {
+  font-size: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  margin-top: 50px;
+}
+

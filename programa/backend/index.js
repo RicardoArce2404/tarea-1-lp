@@ -80,8 +80,10 @@ app.post("/check-letter", (req, res) => {
 app.post("/change-turn", (req, res) => {
   game.turn1.timeEnd = Date.now();
   game.currentTurn = 2;
-  game.currentPlayer = (game.currentPlayer === 0) ? 1 : 0;
-  res.status(200).json({ player: game.currentPlayer, word: game.turn2.word.str });
+  game.currentPlayer = game.currentPlayer === 0 ? 1 : 0;
+  res
+    .status(200)
+    .json({ player: game.currentPlayer, word: game.turn2.word.str });
   game.turn2.timeStart = Date.now();
   return;
 });
@@ -92,10 +94,12 @@ app.post("/end", (req, res) => {
   let winner = "";
   const p1 = game.player1;
   const p2 = game.player2;
-  const turnP1 = (p1.turn === 1) ? game.turn1 : game.turn2;
-  const turnP2 = (p2.turn === 1) ? game.turn1 : game.turn2;
-  const p1Finished = (turnP1.word.length === turnP1.word.revealedPositions.length);
-  const p2Finished = (turnP2.word.length === turnP2.word.revealedPositions.length);
+  const turnP1 = p1.turn === 1 ? game.turn1 : game.turn2;
+  const turnP2 = p2.turn === 1 ? game.turn1 : game.turn2;
+  const p1Finished =
+    turnP1.word.length === turnP1.word.revealedPositions.length;
+  const p2Finished =
+    turnP2.word.length === turnP2.word.revealedPositions.length;
 
   if (p1Finished) {
     if (p2Finished) {
@@ -121,16 +125,33 @@ app.post("/end", (req, res) => {
   if (winner === "") {
     game.result = "Empate";
   } else {
-    game.result = "Ganador único'"
+    game.result = "Ganador único";
   }
   game.winner = winner;
 
-  history.registerGame(game.player1.name, game.player2.name, game.result, game.winner);
+  history.registerGame(
+    game.player1.name,
+    game.player2.name,
+    game.result,
+    game.winner,
+  );
   res.status(200).send({});
 });
 
 app.post("/get-winner", (req, res) => {
-  res.status(200).json({winner: game.winner});
+  const p1 = game.player1;
+  const p2 = game.player2;
+  const turnP1 = p1.turn === 1 ? game.turn1 : game.turn2;
+  const turnP2 = p2.turn === 1 ? game.turn1 : game.turn2;
+  const timeP1 = (turnP1.timeEnd - turnP1.timeStart) / 1000;
+  const timeP2 = (turnP2.timeEnd - turnP2.timeStart) / 1000;
+  res.status(200).json({
+    winner: game.winner,
+    player1: p1.name,
+    timeP1: timeP1,
+    player2: p2.name,
+    timeP2: timeP2
+  });
 });
 
 app.get("/get-history", (req, res) => {

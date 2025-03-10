@@ -77,17 +77,17 @@ export function GameScreen({ names, handleGameEnd }) {
     if (appearances.includes(i)) {
       letters.push(<div className="letter">{word[i]}</div>);
     } else {
-      letters.push(<div className="letter">-</div>);
+      letters.push(<div className="letter">_</div>);
     }
   }
 
   return (
-    <div className="game-screen">
-      <div className="player-name">
+    <div className="gs">
+      <div className="gs-player-name">
         <h1>Es el turno de: {names[playerNum]}</h1>
       </div>
-      <div className="word">{...letters}</div>
-      <div className="controls">
+      <div className="gs-word">{...letters}</div>
+      <div className="gs-controls">
         <input type="text" name="letter" id="letter" placeholder="-" />
         <button type="button" onClick={checkLetter}>
           Probar
