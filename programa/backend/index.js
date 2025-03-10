@@ -18,6 +18,15 @@ app.post("/start", (req, res) => {
   game = new Game(name1, name2); // Set up game logic.
   const sp = Math.round(Math.random()); // Choose the starting player. 0: P1, 1: P2.P2.
   game.currentPlayer = sp;
+
+  if (sp === 0) {
+    game.player1.turn = 1;
+    game.player2.turn = 2;
+  } else {
+    game.player2.turn = 1;
+    game.player1.turn = 2;
+  }
+
   const word = game.turn1.word.str;
   res.status(200).json({
     startingPlayer: sp,
@@ -72,7 +81,6 @@ app.post("/change-turn", (req, res) => {
   game.turn1.timeEnd = Date.now();
   game.currentTurn = 2;
   const nextPlayer = (game.currentPlayer === 0) ? 1 : 0;
-  console.log({ player: nextPlayer, word: game.turn2.word.str });
   res.status(200).json({ player: nextPlayer, word: game.turn2.word.str });
   game.turn2.timeStart = Date.now();
   return;
@@ -80,7 +88,40 @@ app.post("/change-turn", (req, res) => {
 
 app.post("/end", (req, res) => {
   game.turn2.timeEnd = Date.now();
-})
+  res.status(200).send({});
+});
+
+app.post("/get-winner", (req, res) => {
+  let winner = "";
+  const p1 = game.player1;
+  const p2 = game.player2;
+  const turnP1 = (p1.turn === 1) ? game.turn1 : game.turn2;
+  const turnP2 = (p2.turn === 1) ? game.turn1 : game.turn2;
+  const p1Finished = (turnP1.word.length === turnP1.word.revealedPositions.length);
+  const p2Finished = (turnP2.word.length === turnP2.word.revealedPositions.length);
+
+  if (p1Finished) {
+    if (p2Finished) {
+      const timeP1 = turnP1.timeEnd - turnP1.timeStart;
+      const timeP2 = turnP2.timeEnd - turnP2.timeStart;
+      if (timeP1 < timeP2) {
+        winner = p1.name;
+      } else if (timeP1 > timeP2) {
+        winner = p2.name;
+      } else {
+        console.log("same turn time. check get-winner");
+        console.log(timeP1, timeP2);
+      }
+    } else {
+      winner = p1.name;
+    }
+  } else {
+    if (p2Finished) {
+      winner = p2.name;
+    }
+  }
+  res.status(200).json({winner: winner});
+});
 
 app.listen(port, () => {
   console.log("App ready");

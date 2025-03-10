@@ -44,6 +44,7 @@ class Player {
   constructor(name) {
     this.name = name;
     this.remainingLives = 6;
+    this.turn = undefined;
   }
 }
 
